@@ -557,14 +557,14 @@ function openPayment() {
 
   document.getElementById('paymentModal').classList.add('visible');
 
-  document.querySelector('.progress-step:nth-child(3)').classList.remove('active');
-  document.querySelector('.progress-step:nth-child(5)').classList.add('active');
+  document.querySelectorAll('.progress-step')[0].classList.remove('active');
+  document.querySelectorAll('.progress-step')[1].classList.add('active');
 }
 
 function closePayment() {
   document.getElementById('paymentModal').classList.remove('visible');
-  document.querySelector('.progress-step:nth-child(5)').classList.remove('active');
-  document.querySelector('.progress-step:nth-child(3)').classList.add('active');
+  document.querySelectorAll('.progress-step')[1].classList.remove('active');
+  document.querySelectorAll('.progress-step')[0].classList.add('active');
 }
 
 // ── 确认支付 → 生成凭证 ──
@@ -710,9 +710,9 @@ function showVoucher(record) {
   document.getElementById('myTicketDoc').textContent = doc.emoji + ' ' + doc.name;
 
   document.getElementById('voucherOverlay').classList.add('visible');
-  document.querySelector('.progress-step:nth-child(3)').classList.remove('active');
-  document.querySelector('.progress-step:nth-child(5)').classList.remove('active');
-  document.querySelector('.progress-step:nth-child(7)').classList.add('active');
+  document.querySelectorAll('.progress-step')[0].classList.remove('active');
+  document.querySelectorAll('.progress-step')[1].classList.remove('active');
+  document.querySelectorAll('.progress-step')[2].classList.add('active');
 
   queueTick();
 }
@@ -731,8 +731,8 @@ function closeVoucher() {
   document.getElementById('patientSymptom').value = '';
   document.getElementById('btnConfirm').disabled = true;
 
-  document.querySelector('.progress-step:nth-child(7)').classList.remove('active');
-  document.querySelector('.progress-step:nth-child(3)').classList.add('active');
+  document.querySelectorAll('.progress-step')[2].classList.remove('active');
+  document.querySelectorAll('.progress-step')[0].classList.add('active');
 
   renderCalendar();
   window.scrollTo({ top: 0, behavior: 'smooth' });
