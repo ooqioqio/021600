@@ -427,7 +427,8 @@ function selectDoctorAndSlot(doc, date, period) {
 
 function renderDoctorDetail() {
   if (!selectedDoctor) return;
-  const doc = selectedDoctor;
+  const fullDoc = DOCTORS.find(d => d.id === selectedDoctor.id);
+  const doc = { ...selectedDoctor, description: fullDoc ? fullDoc.description : '' };
 
   document.getElementById('doctorInfoCard').innerHTML = `
     ${doc.id === 'dr1'
