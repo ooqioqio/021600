@@ -22,7 +22,7 @@ getDb();
 console.log('💾 SQLite 数据库已就绪');
 
 const server = app.listen(PORT, () => {
-  console.log(`🏥 未来科技精神病院 · 后端服务已启动`);
+  console.log(`🏥 阴阳怪气精神医院 · 后端服务已启动`);
   console.log(`   API 地址: http://localhost:${PORT}/api`);
   console.log(`   前端页面: http://localhost:${PORT}`);
   console.log(`   按 Ctrl+C 停止服务`);

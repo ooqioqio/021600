@@ -2,7 +2,7 @@
   "name": "future-psychiatric-center",
   "version": "2.0.48",
   "type": "module",
-  "description": "未来科技精神病院系统",
+  "description": "阴阳怪气精神医院系统",
   "scripts": {
     "dev": "node server/index.js",
     "start": "node server/index.js"

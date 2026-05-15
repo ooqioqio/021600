@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🏥 未来科技精神病院 · 挂号系统 v2.0.48</title>
+<title>🏥 阴阳怪气精神医院 · 挂号系统 v2.0.48</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;700&display=swap');
 
@@ -187,6 +187,16 @@
   .voucher-card .queue-label { font-size: 11px; color: var(--silver-dim); letter-spacing: 2px; }
   .voucher-card .btn { margin-top: 18px; }
 
+  /* ── Footer ── */
+  .site-footer { text-align: center; padding: 30px 0 20px; border-top: 1px solid var(--border-subtle); margin-top: 10px; }
+  .site-footer .address { font-size: 12px; color: var(--silver-dim); letter-spacing: 1px; }
+  .site-footer .address strong { color: var(--silver); }
+  .site-footer .disclaimer { font-size: 10px; color: rgba(120,132,148,0.4); margin-top: 6px; letter-spacing: 1px; }
+
+  /* ── Doctor Photo ── */
+  .doctor-photo { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 2px solid var(--blue-neon); flex-shrink: 0; box-shadow: 0 0 16px rgba(0,212,255,0.3); }
+  .doctor-photo.chief { border-color: var(--accent-gold); box-shadow: 0 0 16px rgba(255,170,0,0.3); }
+
   /* ── Responsive ── */
   @media (max-width: 768px) {
     .form-grid { grid-template-columns: 1fr; }
@@ -206,9 +216,9 @@
 <div class="app-container">
 
   <header class="header">
-    <div class="header-badge">FUTURE PSYCHIATRIC CENTER</div>
-    <h1>未来科技精神病院</h1>
-    <p class="subtitle">—— 您的精神，我们的未来 ——</p>
+    <div class="header-badge">YINYANG GUAIQI MENTAL HOSPITAL</div>
+    <h1>阴阳怪气精神医院</h1>
+    <p class="subtitle">—— 来都来了，挂个号再走吧 ——</p>
   </header>
 
   <div class="progress-bar">
@@ -282,6 +292,11 @@
     </div>
   </div>
 
+  <footer class="site-footer">
+    <div class="address">📍 <strong>医院地址：</strong>成洛大道600号</div>
+    <div class="disclaimer">※ 本医院承诺：治不好全额退款（前提是您还记得自己来过）</div>
+  </footer>
+
 </div>
 
 <!-- 微信支付弹窗 -->
@@ -289,12 +304,12 @@
   <div class="modal-panel">
     <div class="payment-header">
       <div class="pay-title">💚 微信支付</div>
-      <div class="pay-merchant">未来科技精神病院 · 门诊挂号费</div>
+      <div class="pay-merchant">阴阳怪气精神医院 · 门诊挂号费</div>
     </div>
     <div class="payment-body">
       <div class="payment-amount"><span class="yen">¥</span><span id="payAmount">0</span></div>
       <div class="payment-detail">
-        <span class="label">收款方</span> <span class="val" id="payMerchant">未来科技精神病院</span><br>
+        <span class="label">收款方</span> <span class="val" id="payMerchant">阴阳怪气精神医院</span><br>
         <span class="label">医师</span> <span class="val" id="payDoctor">-</span><br>
         <span class="label">时间</span> <span class="val" id="payTime">-</span>
       </div>
@@ -414,7 +429,10 @@ function renderDoctorDetail() {
   const doc = selectedDoctor;
 
   document.getElementById('doctorInfoCard').innerHTML = `
-    <div class="avatar-lg${doc.level === '主任' ? ' chief' : ''}">${doc.emoji}</div>
+    ${doc.id === 'dr1'
+      ? `<img class="doctor-photo chief" src="pic_doctor/dengzhuren.png" alt="邓主任" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+      : `<div class="avatar-lg" style="display:flex">${doc.emoji}</div>`}
+    <div class="avatar-lg${doc.level === '主任' && doc.id !== 'dr1' ? ' chief' : ''}" style="${doc.id === 'dr1' ? 'display:none' : ''}">${doc.emoji}</div>
     <div class="detail-body">
       <div class="detail-name">
         ${doc.name}
@@ -465,7 +483,7 @@ function openPayment() {
   document.getElementById('payBtnAmount').textContent = doc.fee;
   document.getElementById('payDoctor').textContent = doc.emoji + ' ' + doc.name + '（' + doc.level + '）';
   document.getElementById('payTime').textContent = selectedSlot.date + ' ' + getWeekday(d) + ' ' + (selectedSlot.period === 'am' ? '上午' : '下午');
-  document.getElementById('payMerchant').textContent = '未来科技精神病院';
+  document.getElementById('payMerchant').textContent = '阴阳怪气精神医院';
 
   document.getElementById('paymentModal').classList.add('visible');
 
@@ -587,7 +605,7 @@ window.closeVoucher = closeVoucher;
 
 // ── 初始化 ──
 async function init() {
-  console.log('🚀 未来科技精神病院 · 挂号系统 v2.0.48 已启动');
+  console.log('🚀 阴阳怪气精神医院 · 挂号系统 v2.0.48 已启动');
   console.log('🔌 正连接后端服务...');
 
   try {
