@@ -1,0 +1,5 @@
+node_modules/
+.env
+fpc_data.db
+fpc_data.db-shm
+fpc_data.db-wal

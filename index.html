@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏥 未来科技精神病院 · 挂号系统 v2.0.48</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;700&display=swap');
+
+  :root {
+    --bg-deep: #0a0e17;
+    --bg-panel: #0d1321;
+    --bg-card: #111827;
+    --blue-neon: #00d4ff;
+    --blue-glow: #0099cc;
+    --blue-dark: #0a2a40;
+    --silver: #c0c8d4;
+    --silver-dim: #7a8494;
+    --white: #e8ecf1;
+    --white-dim: #8899aa;
+    --accent-red: #ff3366;
+    --accent-green: #00e676;
+    --accent-gold: #ffaa00;
+    --wechat-green: #07c160;
+    --border-glow: rgba(0,212,255,0.3);
+    --border-subtle: rgba(120,140,170,0.2);
+    --font-display: 'Orbitron', 'Noto Sans SC', sans-serif;
+    --font-body: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg-deep);
+    color: var(--white);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,212,255,0.012) 2px, rgba(0,212,255,0.012) 4px),
+      radial-gradient(ellipse at 50% 0%, rgba(0,180,255,0.06) 0%, transparent 60%);
+    pointer-events: none; z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle at 80% 20%, rgba(0,212,255,0.03) 0%, transparent 50%),
+                radial-gradient(circle at 20% 80%, rgba(0,150,255,0.02) 0%, transparent 50%);
+    pointer-events: none; z-index: 0;
+  }
+
+  .app-container { position: relative; z-index: 1; max-width: 1000px; margin: 0 auto; padding: 20px 24px 60px; }
+
+  .header { text-align: center; padding: 28px 0 16px; position: relative; }
+  .header::after { content: ''; display: block; width: 60%; height: 1px; margin: 16px auto 0; background: linear-gradient(90deg, transparent, var(--blue-neon), transparent); opacity: 0.5; }
+  .header-badge { display: inline-block; border: 1px solid var(--blue-neon); color: var(--blue-neon); font-family: var(--font-display); font-size: 10px; letter-spacing: 3px; padding: 3px 14px; margin-bottom: 10px; text-transform: uppercase; position: relative; }
+  .header-badge::before, .header-badge::after { content: '◆'; position: absolute; top: 50%; transform: translateY(-50%); font-size: 5px; color: var(--blue-neon); }
+  .header-badge::before { left: -9px; } .header-badge::after { right: -9px; }
+  .header h1 { font-family: var(--font-display); font-size: 32px; font-weight: 900; letter-spacing: 4px; color: var(--white); text-shadow: 0 0 30px rgba(0,212,255,0.5), 0 0 60px rgba(0,212,255,0.2); margin-bottom: 4px; }
+  .header .subtitle { font-size: 12px; color: var(--silver-dim); letter-spacing: 2px; }
+
+  .progress-bar { display: flex; justify-content: center; gap: 0; margin: 20px 0 28px; flex-wrap: wrap; }
+  .progress-step { display: flex; align-items: center; gap: 6px; padding: 6px 12px; font-size: 11px; color: var(--silver-dim); letter-spacing: 1px; transition: all 0.3s; }
+  .progress-step .dot { width: 8px; height: 8px; border-radius: 50%; border: 2px solid var(--silver-dim); transition: all 0.3s; }
+  .progress-step.active { color: var(--blue-neon); text-shadow: 0 0 10px rgba(0,212,255,0.4); }
+  .progress-step.active .dot { border-color: var(--blue-neon); background: var(--blue-neon); box-shadow: 0 0 10px var(--blue-neon); }
+  .progress-arrow { color: var(--silver-dim); font-size: 12px; display: flex; align-items: center; padding: 0 2px; }
+
+  .panel { background: var(--bg-panel); border: 1px solid var(--border-subtle); border-radius: 4px; padding: 24px; margin-bottom: 20px; position: relative; }
+  .panel::before { content: ''; position: absolute; top: -1px; left: 20px; right: 20px; height: 1px; background: linear-gradient(90deg, transparent, rgba(0,212,255,0.35), transparent); }
+  .panel-title { font-family: var(--font-display); font-size: 14px; font-weight: 700; letter-spacing: 2px; color: var(--blue-neon); margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+  .panel-title .icon { font-size: 16px; }
+  .panel-title .line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-glow), transparent); }
+
+  /* ── Calendar ── */
+  .calendar { width: 100%; border-collapse: collapse; }
+  .calendar th { padding: 10px 6px; text-align: center; font-size: 11px; font-weight: 400; color: var(--silver-dim); letter-spacing: 1px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); }
+  .calendar th.col-date { min-width: 100px; }
+  .calendar td { padding: 0; text-align: center; border: 1px solid var(--border-subtle); vertical-align: top; }
+  .calendar .date-header { padding: 8px 4px 4px; font-size: 11px; color: var(--silver); font-weight: 700; background: rgba(0,0,0,0.15); }
+  .calendar .weekday-tag { display: block; font-size: 10px; color: var(--silver-dim); font-weight: 400; }
+
+  .slot-box { padding: 8px 6px; min-height: 60px; }
+  .slot-label { font-size: 10px; color: var(--silver-dim); letter-spacing: 1px; margin-bottom: 4px; }
+  .slot-box .doctor-tag { display: inline-block; padding: 3px 10px; margin: 2px; font-size: 11px; border-radius: 2px; cursor: pointer; transition: all 0.2s; border: 1px solid var(--border-subtle); color: var(--silver); background: rgba(0,212,255,0.05); }
+  .slot-box .doctor-tag:hover { border-color: var(--blue-neon); color: var(--blue-neon); background: rgba(0,212,255,0.12); box-shadow: 0 0 10px rgba(0,212,255,0.2); }
+  .slot-box .doctor-tag.selected { border-color: var(--accent-green); color: var(--accent-green); background: rgba(0,230,118,0.1); box-shadow: 0 0 10px rgba(0,230,118,0.2); }
+  .slot-box .doctor-tag.chief { border-color: rgba(255,170,0,0.4); color: var(--accent-gold); }
+  .slot-box .doctor-tag.chief:hover { border-color: var(--accent-gold); box-shadow: 0 0 10px rgba(255,170,0,0.3); }
+  .slot-box .empty { font-size: 11px; color: rgba(120,132,148,0.25); padding: 10px 0; }
+
+  .legend { display: flex; gap: 20px; justify-content: center; margin-top: 14px; font-size: 11px; color: var(--silver-dim); flex-wrap: wrap; }
+  .legend span { display: flex; align-items: center; gap: 6px; }
+  .legend .dot { width: 8px; height: 8px; border-radius: 2px; }
+  .legend .dot.chief-dot { background: var(--accent-gold); }
+  .legend .dot.expert-dot { background: var(--blue-neon); }
+  .legend .price-tag { color: var(--accent-green); }
+
+  /* ── Doctor Detail ── */
+  .doctor-detail { display: none; }
+  .doctor-detail.visible { display: block; }
+  .doctor-info-card { display: flex; gap: 20px; align-items: flex-start; padding: 16px 0; }
+  .doctor-info-card .avatar-lg { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, var(--blue-dark), #0d2240); border: 2px solid var(--blue-neon); display: flex; align-items: center; justify-content: center; font-size: 30px; flex-shrink: 0; box-shadow: 0 0 16px rgba(0,212,255,0.3); }
+  .doctor-info-card .avatar-lg.chief { border-color: var(--accent-gold); box-shadow: 0 0 16px rgba(255,170,0,0.3); }
+  .doctor-info-card .detail-body { flex: 1; }
+  .doctor-info-card .detail-name { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .doctor-info-card .level-badge { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 2px; letter-spacing: 1px; font-family: var(--font-display); }
+  .level-badge.chief { border: 1px solid var(--accent-gold); color: var(--accent-gold); }
+  .level-badge.expert { border: 1px solid var(--blue-neon); color: var(--blue-neon); }
+  .doctor-info-card .detail-desc { font-size: 13px; color: var(--silver-dim); line-height: 1.7; margin-bottom: 8px; }
+  .doctor-info-card .detail-meta { font-size: 11px; color: var(--silver-dim); display: flex; gap: 16px; flex-wrap: wrap; }
+  .doctor-info-card .detail-meta span { display: flex; align-items: center; gap: 4px; }
+  .doctor-info-card .fee-highlight { color: var(--accent-green); font-weight: 700; font-size: 16px; }
+
+  /* ── Form ── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group.full { grid-column: 1 / -1; }
+  .form-group label { font-size: 10px; color: var(--silver-dim); letter-spacing: 2px; text-transform: uppercase; }
+  .form-group input, .form-group select, .form-group textarea { background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--white); padding: 9px 12px; font-size: 13px; font-family: var(--font-body); border-radius: 3px; transition: all 0.3s; outline: none; }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--blue-neon); box-shadow: 0 0 10px rgba(0,212,255,0.12); }
+  .form-group select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300d4ff' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 32px; }
+  .form-group select option { background: var(--bg-card); color: var(--white); }
+  .form-group textarea { resize: vertical; min-height: 70px; }
+
+  /* ── Buttons ── */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 24px; font-family: var(--font-display); font-size: 13px; font-weight: 700; letter-spacing: 2px; border: none; border-radius: 3px; cursor: pointer; transition: all 0.3s; text-transform: uppercase; }
+  .btn-primary { background: linear-gradient(135deg, #005577, #0088aa); color: var(--white); border: 1px solid var(--blue-neon); box-shadow: 0 0 20px rgba(0,212,255,0.2); }
+  .btn-primary:hover:not(:disabled) { background: linear-gradient(135deg, #006688, #0099bb); box-shadow: 0 0 30px rgba(0,212,255,0.4); transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-ghost { background: transparent; color: var(--silver); border: 1px solid var(--border-subtle); }
+  .btn-ghost:hover { border-color: var(--blue-neon); color: var(--blue-neon); }
+  .btn-row { display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; }
+
+  /* ── Payment Modal ── */
+  .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 200; }
+  .modal-overlay.visible { display: flex; }
+  .modal-panel { background: #1a1a1a; border-radius: 12px; width: 380px; max-width: 95vw; overflow: hidden; animation: slideUp 0.3s ease; }
+  @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  .payment-header { background: #2c2c2c; padding: 16px 20px; text-align: center; border-bottom: 1px solid #333; }
+  .payment-header .pay-title { font-size: 16px; color: #fff; font-weight: 700; }
+  .payment-header .pay-merchant { font-size: 11px; color: #999; margin-top: 2px; }
+
+  .payment-body { padding: 24px 20px; text-align: center; }
+  .payment-amount { font-size: 40px; font-weight: 900; color: #fff; margin-bottom: 4px; font-family: var(--font-display); }
+  .payment-amount .yen { font-size: 24px; }
+  .payment-detail { font-size: 12px; color: #999; line-height: 1.8; margin-bottom: 20px; }
+  .payment-detail .label { color: #777; }
+  .payment-detail .val { color: #ccc; }
+
+  .payment-qr { width: 160px; height: 160px; margin: 0 auto 16px; background: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+  .payment-qr .qr-inner { text-align: center; color: #333; }
+  .payment-qr .qr-icon { font-size: 40px; margin-bottom: 6px; }
+  .payment-qr .qr-text { font-size: 10px; }
+  .payment-qr .qr-scan-line { position: absolute; left: 10px; right: 10px; height: 2px; background: var(--wechat-green); animation: qrScan 2s ease-in-out infinite; }
+  @keyframes qrScan { 0% { top: 20px; opacity: 0; } 50% { opacity: 1; } 100% { top: 140px; opacity: 0; } }
+
+  .payment-status { font-size: 12px; color: #999; margin-bottom: 16px; }
+  .payment-status .wechat-icon { color: var(--wechat-green); font-size: 20px; vertical-align: middle; margin-right: 4px; }
+
+  .btn-pay { width: 100%; padding: 13px; background: var(--wechat-green); color: #fff; font-size: 15px; font-weight: 700; border: none; border-radius: 6px; cursor: pointer; letter-spacing: 1px; transition: all 0.2s; }
+  .btn-pay:hover { background: #06ad56; }
+  .btn-pay:active { transform: scale(0.98); }
+
+  .payment-footer { padding: 12px 20px; text-align: center; border-top: 1px solid #333; }
+  .btn-cancel-pay { background: none; border: none; color: #666; font-size: 13px; cursor: pointer; letter-spacing: 1px; }
+  .btn-cancel-pay:hover { color: #999; }
+
+  /* ── Voucher / Queue ── */
+  .voucher-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10,14,23,0.92); display: none; align-items: center; justify-content: center; z-index: 250; }
+  .voucher-overlay.visible { display: flex; }
+  .voucher-card { background: var(--bg-panel); border: 2px solid var(--accent-green); border-radius: 8px; padding: 30px; text-align: center; max-width: 440px; width: 95vw; box-shadow: 0 0 40px rgba(0,230,118,0.15); }
+  .voucher-card .v-icon { font-size: 48px; margin-bottom: 12px; }
+  .voucher-card h2 { font-family: var(--font-display); color: var(--accent-green); letter-spacing: 2px; font-size: 20px; margin-bottom: 6px; }
+  .voucher-card .reg-id { font-family: var(--font-display); font-size: 26px; color: var(--blue-neon); letter-spacing: 3px; margin: 8px 0; text-shadow: 0 0 16px rgba(0,212,255,0.4); }
+  .voucher-card .v-info { font-size: 12px; color: var(--silver-dim); line-height: 2; }
+  .voucher-card .v-info strong { color: var(--white); }
+  .voucher-card .queue-pos { font-family: var(--font-display); font-size: 36px; color: var(--accent-gold); margin: 10px 0; text-shadow: 0 0 20px rgba(255,170,0,0.4); }
+  .voucher-card .queue-label { font-size: 11px; color: var(--silver-dim); letter-spacing: 2px; }
+  .voucher-card .btn { margin-top: 18px; }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .doctor-info-card { flex-direction: column; align-items: center; text-align: center; }
+    .calendar th, .calendar td { font-size: 9px; }
+    .slot-box .doctor-tag { font-size: 10px; padding: 2px 6px; }
+    .header h1 { font-size: 22px; }
+    .calendar .col-date { min-width: 60px; }
+  }
+
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+  .pulse { animation: pulse 2s infinite; }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <header class="header">
+    <div class="header-badge">FUTURE PSYCHIATRIC CENTER</div>
+    <h1>未来科技精神病院</h1>
+    <p class="subtitle">—— 您的精神，我们的未来 ——</p>
+  </header>
+
+  <div class="progress-bar">
+    <div class="progress-step active"><span class="dot"></span> 选择医师</div>
+    <span class="progress-arrow">▸</span>
+    <div class="progress-step"><span class="dot"></span> 确认支付</div>
+    <span class="progress-arrow">▸</span>
+    <div class="progress-step"><span class="dot"></span> 排队候诊</div>
+  </div>
+
+  <!-- 日历排班表 -->
+  <div class="panel" id="panel-calendar">
+    <div class="panel-title">
+      <span class="icon">📅</span> 本周医师排班 · 点击医生即可挂号
+      <span class="line"></span>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="calendar" id="calendarTable">
+        <thead id="calendarHead"></thead>
+        <tbody id="calendarBody"></tbody>
+      </table>
+    </div>
+    <div class="legend">
+      <span><span class="dot chief-dot"></span> 主任医师 · 挂号费 <span class="price-tag">5元</span></span>
+      <span><span class="dot expert-dot"></span> 一级专家 · 挂号费 <span class="price-tag">3元</span></span>
+      <span>每位医师每周坐诊 <span style="color:var(--accent-green);">三个半天</span></span>
+    </div>
+  </div>
+
+  <!-- 医生详情 + 患者信息 -->
+  <div class="panel doctor-detail" id="panel-detail">
+    <div class="panel-title">
+      <span class="icon">🩺</span> 医师详情 & 患者登记
+      <span class="line"></span>
+    </div>
+    <div class="doctor-info-card" id="doctorInfoCard"></div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>姓名</label>
+        <input type="text" id="patientName" placeholder="请输入您的姓名">
+      </div>
+      <div class="form-group">
+        <label>年龄</label>
+        <input type="number" id="patientAge" placeholder="请输入年龄" min="1" max="150">
+      </div>
+      <div class="form-group">
+        <label>性别</label>
+        <select id="patientGender">
+          <option value="">请选择</option>
+          <option value="male">男</option>
+          <option value="female">女</option>
+          <option value="cyborg">赛博格</option>
+          <option value="alien">外星来客</option>
+          <option value="unknown">未知生命体</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>联系电话</label>
+        <input type="tel" id="patientPhone" placeholder="量子通讯频率号">
+      </div>
+      <div class="form-group full">
+        <label>症状自述（可选）</label>
+        <textarea id="patientSymptom" placeholder="请简要描述您的……呃……「状况」。比如：总觉得自己是一台烤面包机……"></textarea>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="cancelSelection()">↩ 返回重选</button>
+      <button class="btn btn-primary" id="btnConfirm" disabled onclick="openPayment()">
+        💳 确认挂号 · 待支付 ¥<span id="btnFee">0</span>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- 微信支付弹窗 -->
+<div class="modal-overlay" id="paymentModal">
+  <div class="modal-panel">
+    <div class="payment-header">
+      <div class="pay-title">💚 微信支付</div>
+      <div class="pay-merchant">未来科技精神病院 · 门诊挂号费</div>
+    </div>
+    <div class="payment-body">
+      <div class="payment-amount"><span class="yen">¥</span><span id="payAmount">0</span></div>
+      <div class="payment-detail">
+        <span class="label">收款方</span> <span class="val" id="payMerchant">未来科技精神病院</span><br>
+        <span class="label">医师</span> <span class="val" id="payDoctor">-</span><br>
+        <span class="label">时间</span> <span class="val" id="payTime">-</span>
+      </div>
+      <div class="payment-qr">
+        <div class="qr-inner">
+          <div class="qr-icon">🛸</div>
+          <div class="qr-text">FPC 收款码</div>
+        </div>
+        <div class="qr-scan-line"></div>
+      </div>
+      <div class="payment-status">
+        <span class="wechat-icon">💚</span> 请使用微信扫一扫完成支付
+      </div>
+      <button class="btn-pay" onclick="confirmPayment()">🔒 确认支付 ¥<span id="payBtnAmount">0</span></button>
+    </div>
+    <div class="payment-footer">
+      <button class="btn-cancel-pay" onclick="closePayment()">取消支付</button>
+    </div>
+  </div>
+</div>
+
+<!-- 挂号凭证 + 排队 -->
+<div class="voucher-overlay" id="voucherOverlay">
+  <div class="voucher-card">
+    <div class="v-icon">✅</div>
+    <h2>支付成功 · 挂号凭证</h2>
+    <div class="reg-id" id="vRegId">-</div>
+    <div class="queue-label">▸ 当前排队序号 ▸</div>
+    <div class="queue-pos" id="vQueuePos">-</div>
+    <div class="v-info" id="vInfo"></div>
+    <button class="btn btn-primary" onclick="closeVoucher()">🔒 确认收到，进入候诊</button>
+  </div>
+</div>
+
+<script type="module">
+const API = '/api';
+
+let DOCTORS = [];
+let scheduleData = [];
+let selectedDoctor = null;
+let selectedSlot = null;
+let queueNumber = 0;
+
+function getWeekday(date) {
+  return ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][date.getDay()];
+}
+
+async function fetchJSON(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`API 请求失败: ${res.status}`);
+  return res.json();
+}
+
+// ── 渲染日历 ──
+function renderCalendar() {
+  const thead = document.getElementById('calendarHead');
+  const tbody = document.getElementById('calendarBody');
+
+  thead.innerHTML = '<tr><th class="col-date">日期</th><th>上午 09:00-12:00</th><th>下午 14:00-17:00</th></tr>';
+  tbody.innerHTML = '';
+
+  for (const day of scheduleData) {
+    const row = document.createElement('tr');
+
+    const dateCell = document.createElement('td');
+    dateCell.innerHTML = `<div class="date-header">${day.date}<span class="weekday-tag">${day.weekday}</span></div>`;
+    row.appendChild(dateCell);
+
+    const renderSlot = (period, doctors) => {
+      const cell = document.createElement('td');
+      const box = document.createElement('div');
+      box.className = 'slot-box';
+      box.innerHTML = `<div class="slot-label">${period === 'am' ? '🌅 上午' : '🌇 下午'}</div>`;
+
+      if (doctors.length === 0) {
+        box.innerHTML += '<div class="empty">—</div>';
+      } else {
+        for (const doc of doctors) {
+          const tag = document.createElement('span');
+          tag.className = 'doctor-tag' + (doc.level === '主任' ? ' chief' : '');
+          tag.textContent = `${doc.emoji} ${doc.name}`;
+          tag.title = `${doc.name}（${doc.level}）· ¥${doc.fee}`;
+
+          const isSelected = selectedDoctor && selectedDoctor.id === doc.id
+            && selectedSlot && selectedSlot.date === day.date && selectedSlot.period === period;
+          if (isSelected) tag.classList.add('selected');
+
+          tag.onclick = () => selectDoctorAndSlot(doc, day.date, period);
+          box.appendChild(tag);
+        }
+      }
+      cell.appendChild(box);
+      return cell;
+    };
+
+    row.appendChild(renderSlot('am', day.am));
+    row.appendChild(renderSlot('pm', day.pm));
+    tbody.appendChild(row);
+  }
+}
+
+// ── 选医生 + 时段 ──
+function selectDoctorAndSlot(doc, date, period) {
+  selectedDoctor = doc;
+  selectedSlot = { date, period };
+  renderCalendar();
+
+  document.getElementById('panel-detail').classList.add('visible');
+  renderDoctorDetail();
+  checkConfirmReady();
+
+  document.getElementById('panel-detail').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function renderDoctorDetail() {
+  if (!selectedDoctor) return;
+  const doc = selectedDoctor;
+
+  document.getElementById('doctorInfoCard').innerHTML = `
+    <div class="avatar-lg${doc.level === '主任' ? ' chief' : ''}">${doc.emoji}</div>
+    <div class="detail-body">
+      <div class="detail-name">
+        ${doc.name}
+        <span class="level-badge${doc.level === '主任' ? ' chief' : ' expert'}">${doc.level}</span>
+      </div>
+      <div class="detail-desc">${doc.description}</div>
+      <div class="detail-meta">
+        <span>📅 ${selectedSlot.date} ${getWeekday(new Date(selectedSlot.date + 'T00:00:00'))} ${selectedSlot.period === 'am' ? '上午' : '下午'}</span>
+        <span>💰 挂号费：<span class="fee-highlight">¥${doc.fee}</span></span>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('btnFee').textContent = doc.fee;
+  document.getElementById('patientName').focus();
+}
+
+function cancelSelection() {
+  selectedDoctor = null;
+  selectedSlot = null;
+  document.getElementById('panel-detail').classList.remove('visible');
+  document.getElementById('patientName').value = '';
+  document.getElementById('patientAge').value = '';
+  document.getElementById('patientGender').value = '';
+  document.getElementById('patientPhone').value = '';
+  document.getElementById('patientSymptom').value = '';
+  document.getElementById('btnConfirm').disabled = true;
+  renderCalendar();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── 表单监听 ──
+function checkConfirmReady() {
+  const btn = document.getElementById('btnConfirm');
+  const hasName = document.getElementById('patientName').value.trim() !== '';
+  btn.disabled = !(selectedDoctor && selectedSlot && hasName);
+}
+
+document.getElementById('patientName').addEventListener('input', checkConfirmReady);
+
+// ── 打开支付弹窗 ──
+function openPayment() {
+  if (!selectedDoctor || !selectedSlot) return;
+  const doc = selectedDoctor;
+  const d = new Date(selectedSlot.date + 'T00:00:00');
+
+  document.getElementById('payAmount').textContent = doc.fee;
+  document.getElementById('payBtnAmount').textContent = doc.fee;
+  document.getElementById('payDoctor').textContent = doc.emoji + ' ' + doc.name + '（' + doc.level + '）';
+  document.getElementById('payTime').textContent = selectedSlot.date + ' ' + getWeekday(d) + ' ' + (selectedSlot.period === 'am' ? '上午' : '下午');
+  document.getElementById('payMerchant').textContent = '未来科技精神病院';
+
+  document.getElementById('paymentModal').classList.add('visible');
+
+  document.querySelector('.progress-step:nth-child(3)').classList.remove('active');
+  document.querySelector('.progress-step:nth-child(5)').classList.add('active');
+}
+
+function closePayment() {
+  document.getElementById('paymentModal').classList.remove('visible');
+  document.querySelector('.progress-step:nth-child(5)').classList.remove('active');
+  document.querySelector('.progress-step:nth-child(3)').classList.add('active');
+}
+
+// ── 确认支付 → 生成凭证 ──
+async function confirmPayment() {
+  if (!selectedDoctor || !selectedSlot) return;
+
+  const name = document.getElementById('patientName').value.trim();
+  const age = document.getElementById('patientAge').value;
+  const gender = document.getElementById('patientGender').value;
+  const phone = document.getElementById('patientPhone').value;
+  const symptom = document.getElementById('patientSymptom').value;
+
+  if (!name) {
+    alert('⚠ 请先输入姓名');
+    return;
+  }
+
+  const btn = document.querySelector('.btn-pay');
+  btn.textContent = '⏳ 处理中...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(`${API}/registrations`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name,
+        age: age ? parseInt(age) : null,
+        gender: gender || null,
+        phone: phone || null,
+        doctorId: selectedDoctor.id,
+        scheduleDate: selectedSlot.date,
+        period: selectedSlot.period,
+        symptom: symptom || null,
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || '支付失败');
+    }
+
+    const record = await res.json();
+
+    // 生成排队号
+    queueNumber = Math.floor(Math.random() * 30) + 1;
+
+    document.getElementById('paymentModal').classList.remove('visible');
+    showVoucher(record);
+  } catch (err) {
+    alert('⚠ 挂号失败：' + err.message);
+    console.error(err);
+  } finally {
+    btn.textContent = '🔒 确认支付 ¥' + selectedDoctor.fee;
+    btn.disabled = false;
+  }
+}
+
+function showVoucher(record) {
+  const doc = selectedDoctor;
+  const d = new Date(selectedSlot.date + 'T00:00:00');
+  const periodLabel = selectedSlot.period === 'am' ? '上午 09:00-12:00' : '下午 14:00-17:00';
+  const genderLabels = { male: '男', female: '女', cyborg: '🤖 赛博格', alien: '👽 外星来客', unknown: '❓ 未知生命体' };
+
+  document.getElementById('vRegId').textContent = record.id;
+  document.getElementById('vQueuePos').textContent = 'NO.' + String(queueNumber).padStart(3, '0');
+  document.getElementById('vInfo').innerHTML = `
+    <strong>医师：</strong>${doc.emoji} ${doc.name}（${doc.level}）<br>
+    <strong>时间：</strong>${selectedSlot.date} ${getWeekday(d)} ${periodLabel}<br>
+    <strong>患者：</strong>${record.patient_name}${record.age ? ' · ' + record.age + '岁' : ''}${record.gender ? ' · ' + (genderLabels[record.gender]||record.gender) : ''}<br>
+    <strong>挂号费：</strong><span style="color:var(--accent-green);">¥${doc.fee}.00</span> · 已支付 ✅<br>
+    ${record.phone ? '<strong>联系电话：</strong>' + record.phone + '<br>' : ''}
+  `;
+
+  document.getElementById('voucherOverlay').classList.add('visible');
+
+  document.querySelector('.progress-step:nth-child(3)').classList.remove('active');
+  document.querySelector('.progress-step:nth-child(5)').classList.remove('active');
+  document.querySelector('.progress-step:nth-child(7)').classList.add('active');
+}
+
+function closeVoucher() {
+  document.getElementById('voucherOverlay').classList.remove('visible');
+
+  selectedDoctor = null;
+  selectedSlot = null;
+  document.getElementById('panel-detail').classList.remove('visible');
+  document.getElementById('patientName').value = '';
+  document.getElementById('patientAge').value = '';
+  document.getElementById('patientGender').value = '';
+  document.getElementById('patientPhone').value = '';
+  document.getElementById('patientSymptom').value = '';
+  document.getElementById('btnConfirm').disabled = true;
+
+  document.querySelector('.progress-step:nth-child(7)').classList.remove('active');
+  document.querySelector('.progress-step:nth-child(3)').classList.add('active');
+
+  renderCalendar();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── 暴露全局 ──
+window.cancelSelection = cancelSelection;
+window.openPayment = openPayment;
+window.closePayment = closePayment;
+window.confirmPayment = confirmPayment;
+window.closeVoucher = closeVoucher;
+
+// ── 初始化 ──
+async function init() {
+  console.log('🚀 未来科技精神病院 · 挂号系统 v2.0.48 已启动');
+  console.log('🔌 正连接后端服务...');
+
+  try {
+    [DOCTORS, scheduleData] = await Promise.all([
+      fetchJSON(`${API}/doctors`),
+      fetchJSON(`${API}/doctors/schedule`),
+    ]);
+    console.log('✅ 后端连接成功，数据库就绪');
+    console.log('👨‍⚕️ 本周坐诊医师：', DOCTORS.map(d => d.name).join('、'));
+    renderCalendar();
+  } catch (err) {
+    console.error('❌ 无法连接后端服务:', err.message);
+    document.getElementById('calendarBody').innerHTML = `
+      <tr><td colspan="3" style="padding:40px;color:var(--accent-red);text-align:center;">
+        ⚠ 无法连接后端服务<br>
+        <span style="font-size:11px;color:var(--silver-dim);">请先运行：npm run dev</span>
+      </td></tr>`;
+  }
+}
+
+init();
+</script>
+
+</body>
+</html>
