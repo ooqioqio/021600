@@ -187,6 +187,49 @@
   .voucher-card .queue-label { font-size: 11px; color: var(--silver-dim); letter-spacing: 2px; }
   .voucher-card .btn { margin-top: 18px; }
 
+  /* ── Queue Screen ── */
+  .queue-screen { width: 520px; max-width: 95vw; background: #0a0c10; border: 3px solid #1a3a2a; border-radius: 6px; overflow: hidden; animation: slideUp 0.3s ease; box-shadow: 0 0 60px rgba(0,30,15,0.6), inset 0 0 40px rgba(0,10,5,0.4); }
+  .queue-header { background: #0d1510; border-bottom: 1px solid #1a3a2a; padding: 14px 20px; text-align: center; }
+  .queue-hospital { font-size: 13px; color: #4a7a5a; letter-spacing: 2px; }
+  .queue-title { font-family: 'SimHei','Microsoft YaHei',sans-serif; font-size: 28px; font-weight: 900; color: #e74c3c; letter-spacing: 12px; margin: 4px 0; text-shadow: 0 0 20px rgba(231,76,60,0.5); }
+  .queue-time { font-size: 11px; color: #4a6a4a; letter-spacing: 1px; }
+
+  .queue-main { padding: 16px 20px; }
+  .queue-now-calling { display: flex; align-items: center; gap: 12px; background: #0f1a12; border: 1px solid #1a3a2a; padding: 10px 16px; border-radius: 3px; margin-bottom: 14px; }
+  .call-label { font-size: 12px; color: #5a8a5a; letter-spacing: 1px; animation: pulse 1.5s infinite; }
+  .call-number { font-family: var(--font-display); font-size: 22px; color: #e74c3c; font-weight: 900; letter-spacing: 3px; text-shadow: 0 0 15px rgba(231,76,60,0.4); }
+  .call-name { font-size: 14px; color: #ccc; font-weight: 700; }
+
+  .queue-list-panel { border: 1px solid #1a2a1a; border-radius: 3px; overflow: hidden; margin-bottom: 14px; }
+  .queue-list-title { background: #0f1a12; padding: 6px 12px; font-size: 10px; color: #3a6a3a; letter-spacing: 3px; text-align: center; border-bottom: 1px solid #1a2a1a; }
+  .queue-list { max-height: 220px; overflow: hidden; }
+  .queue-row { display: flex; align-items: center; padding: 5px 14px; border-bottom: 1px solid rgba(26,42,26,0.5); font-size: 12px; transition: all 0.2s; }
+  .queue-row:nth-child(odd) { background: rgba(10,20,10,0.3); }
+  .queue-row.you { background: rgba(0,212,255,0.08); border-left: 3px solid var(--blue-neon); }
+  .queue-row .q-num { font-family: var(--font-display); width: 50px; color: var(--silver-dim); font-size: 11px; letter-spacing: 1px; flex-shrink: 0; }
+  .queue-row .q-name { flex: 1; color: #b0b8a0; }
+  .queue-row .q-status { font-size: 10px; color: #3a6a3a; letter-spacing: 1px; flex-shrink: 0; }
+  .queue-row.you .q-name { color: var(--blue-neon); font-weight: 700; }
+  .queue-row.you .q-status { color: var(--blue-neon); }
+  @keyframes rowSlideUp {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  .queue-row.new { animation: rowSlideUp 0.3s ease; }
+
+  .queue-ahead { text-align: center; padding: 8px 0; }
+  .ahead-label { font-size: 12px; color: #6a8a6a; letter-spacing: 1px; }
+  .ahead-count { font-family: var(--font-display); font-size: 40px; color: var(--accent-green); font-weight: 900; margin: 0 6px; text-shadow: 0 0 20px rgba(0,230,118,0.5); vertical-align: middle; display: inline-block; min-width: 50px; }
+  .ahead-flash { animation: aheadPulse 0.4s ease; }
+  @keyframes aheadPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.2); color: #fff; } }
+
+  .queue-footer { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #0d1510; border-top: 1px solid #1a3a2a; }
+  .queue-my-ticket { display: flex; align-items: center; gap: 10px; }
+  .my-label { font-size: 10px; color: #4a7a5a; letter-spacing: 1px; }
+  .my-number { font-family: var(--font-display); font-size: 18px; color: var(--accent-gold); font-weight: 900; letter-spacing: 2px; }
+  .my-doctor { font-size: 11px; color: var(--silver-dim); }
+  .queue-leave-btn { font-size: 11px; padding: 6px 14px; border-color: rgba(120,140,120,0.3); color: #6a8a6a; }
+
   /* ── Footer ── */
   .site-footer { text-align: center; padding: 30px 0 20px; border-top: 1px solid var(--border-subtle); margin-top: 10px; }
   .site-footer .address { font-size: 12px; color: var(--silver-dim); letter-spacing: 1px; }
@@ -332,16 +375,42 @@
   </div>
 </div>
 
-<!-- 挂号凭证 + 排队 -->
+<!-- 排队叫号屏 -->
 <div class="voucher-overlay" id="voucherOverlay">
-  <div class="voucher-card">
-    <div class="v-icon">✅</div>
-    <h2>支付成功 · 挂号凭证</h2>
-    <div class="reg-id" id="vRegId">-</div>
-    <div class="queue-label">▸ 当前排队序号 ▸</div>
-    <div class="queue-pos" id="vQueuePos">-</div>
-    <div class="v-info" id="vInfo"></div>
-    <button class="btn btn-primary" onclick="closeVoucher()">🔒 确认收到，进入候诊</button>
+  <div class="queue-screen">
+    <div class="queue-header">
+      <div class="queue-hospital">🏥 阴阳怪气精神医院</div>
+      <div class="queue-title">候 诊 叫 号 屏</div>
+      <div class="queue-time" id="queueTime"></div>
+    </div>
+
+    <div class="queue-main">
+      <div class="queue-now-calling">
+        <span class="call-label">▶ 当前叫号</span>
+        <span class="call-number" id="currentCallNum">A001</span>
+        <span class="call-name" id="currentCallName">-</span>
+      </div>
+
+      <div class="queue-list-panel">
+        <div class="queue-list-title">候 诊 队 列</div>
+        <div class="queue-list" id="queueList"></div>
+      </div>
+
+      <div class="queue-ahead">
+        <span class="ahead-label">您的前方还有</span>
+        <span class="ahead-count" id="aheadCount">0</span>
+        <span class="ahead-label">人</span>
+      </div>
+    </div>
+
+    <div class="queue-footer">
+      <div class="queue-my-ticket">
+        <span class="my-label">您的号码</span>
+        <span class="my-number" id="myTicketNum">-</span>
+        <span class="my-doctor" id="myTicketDoc">-</span>
+      </div>
+      <button class="btn btn-ghost queue-leave-btn" onclick="closeVoucher()">不排了，我要回家</button>
+    </div>
   </div>
 </div>
 
@@ -352,7 +421,6 @@ let DOCTORS = [];
 let scheduleData = [];
 let selectedDoctor = null;
 let selectedSlot = null;
-let queueNumber = 0;
 
 function getWeekday(date) {
   return ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][date.getDay()];
@@ -541,9 +609,6 @@ async function confirmPayment() {
 
     const record = await res.json();
 
-    // 生成排队号
-    queueNumber = Math.floor(Math.random() * 30) + 1;
-
     document.getElementById('paymentModal').classList.remove('visible');
     showVoucher(record);
   } catch (err) {
@@ -555,30 +620,105 @@ async function confirmPayment() {
   }
 }
 
+let queueTimer = null;
+let queueAhead = 0;
+let queueCurrentNum = 0;
+let queueMyNum = '';
+
+const FAKE_FIRST_NAMES = ['建国','伟民','秀英','志强','美玲','小明','大壮','翠花','铁柱','阿珍','阿强','桂花','富贵','来福','旺财','招娣','盼娣','念娣','根生','水生','金凤','银凤','玉兰','春梅','秋菊','冬梅','雪花','彩霞','云龙','飞虎','天龙'];
+const FAKE_LAST_NAMES = ['张','李','王','陈','刘','赵','黄','周','吴','杨','孙','胡','朱','高','林','何','郭','马','罗','梁','宋','郑','谢','韩','唐'];
+
+function randomName() {
+  const last = FAKE_LAST_NAMES[Math.floor(Math.random() * FAKE_LAST_NAMES.length)];
+  const first = FAKE_FIRST_NAMES[Math.floor(Math.random() * FAKE_FIRST_NAMES.length)];
+  return last + first;
+}
+
+function padNum(n) { return 'A' + String(n).padStart(3, '0'); }
+
+function updateQueueTime() {
+  const now = new Date();
+  document.getElementById('queueTime').textContent =
+    now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0') +
+    ' ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ':' + String(now.getSeconds()).padStart(2,'0');
+}
+
+function renderQueueList(names) {
+  const list = document.getElementById('queueList');
+  list.innerHTML = '';
+  for (let i = 0; i < names.length; i++) {
+    const row = document.createElement('div');
+    row.className = 'queue-row';
+    if (i === 0 && names[i] === '★ 就 是 你 ★') {
+      row.classList.add('you');
+      row.innerHTML = `<span class="q-num">${queueMyNum}</span><span class="q-name">${names[i]}</span><span class="q-status">候诊中</span>`;
+    } else {
+      row.innerHTML = `<span class="q-num">${padNum(queueCurrentNum + i + 2)}</span><span class="q-name">${names[i]}</span><span class="q-status">候诊</span>`;
+    }
+    list.appendChild(row);
+  }
+}
+
+function queueTick() {
+  if (queueAhead <= 0) {
+    queueAhead = Math.floor(Math.random() * 21) + 30;
+    queueCurrentNum = Math.floor(Math.random() * 50) + 10;
+  }
+
+  queueAhead--;
+  queueCurrentNum++;
+
+  updateQueueTime();
+
+  const callingName = randomName();
+  document.getElementById('currentCallNum').textContent = padNum(queueCurrentNum);
+  document.getElementById('currentCallName').textContent = callingName;
+
+  const names = [];
+  const visibleCount = Math.min(queueAhead, 10);
+  for (let i = 0; i < visibleCount; i++) {
+    names.push(randomName());
+  }
+
+  const isYourTurn = queueAhead <= 1;
+  if (isYourTurn && Math.random() < 0.4) {
+    names.unshift('★ 就 是 你 ★');
+  } else if (queueAhead === 0 && Math.random() < 0.6) {
+    queueAhead = Math.floor(Math.random() * 21) + 30;
+  }
+
+  renderQueueList(names);
+
+  const aheadEl = document.getElementById('aheadCount');
+  aheadEl.textContent = queueAhead;
+  aheadEl.classList.remove('ahead-flash');
+  void aheadEl.offsetWidth;
+  aheadEl.classList.add('ahead-flash');
+
+  const interval = Math.floor(Math.random() * 2000) + 1000;
+  queueTimer = setTimeout(queueTick, interval);
+}
+
 function showVoucher(record) {
   const doc = selectedDoctor;
-  const d = new Date(selectedSlot.date + 'T00:00:00');
-  const periodLabel = selectedSlot.period === 'am' ? '上午 09:00-12:00' : '下午 14:00-17:00';
-  const genderLabels = { male: '男', female: '女', cyborg: '🤖 赛博格', alien: '👽 外星来客', unknown: '❓ 未知生命体' };
+  queueAhead = Math.floor(Math.random() * 21) + 30;
+  queueCurrentNum = Math.floor(Math.random() * 50) + 10;
+  queueMyNum = padNum(queueCurrentNum + queueAhead + 1);
 
-  document.getElementById('vRegId').textContent = record.id;
-  document.getElementById('vQueuePos').textContent = 'NO.' + String(queueNumber).padStart(3, '0');
-  document.getElementById('vInfo').innerHTML = `
-    <strong>医师：</strong>${doc.emoji} ${doc.name}（${doc.level}）<br>
-    <strong>时间：</strong>${selectedSlot.date} ${getWeekday(d)} ${periodLabel}<br>
-    <strong>患者：</strong>${record.patient_name}${record.age ? ' · ' + record.age + '岁' : ''}${record.gender ? ' · ' + (genderLabels[record.gender]||record.gender) : ''}<br>
-    <strong>挂号费：</strong><span style="color:var(--accent-green);">¥${doc.fee}.00</span> · 已支付 ✅<br>
-    ${record.phone ? '<strong>联系电话：</strong>' + record.phone + '<br>' : ''}
-  `;
+  document.getElementById('queueTime').textContent = '';
+  document.getElementById('myTicketNum').textContent = queueMyNum;
+  document.getElementById('myTicketDoc').textContent = doc.emoji + ' ' + doc.name;
 
   document.getElementById('voucherOverlay').classList.add('visible');
-
   document.querySelector('.progress-step:nth-child(3)').classList.remove('active');
   document.querySelector('.progress-step:nth-child(5)').classList.remove('active');
   document.querySelector('.progress-step:nth-child(7)').classList.add('active');
+
+  queueTick();
 }
 
 function closeVoucher() {
+  if (queueTimer) { clearTimeout(queueTimer); queueTimer = null; }
   document.getElementById('voucherOverlay').classList.remove('visible');
 
   selectedDoctor = null;

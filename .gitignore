@@ -3,3 +3,4 @@ node_modules/
 fpc_data.db
 fpc_data.db-shm
 fpc_data.db-wal
+fameme.conf
